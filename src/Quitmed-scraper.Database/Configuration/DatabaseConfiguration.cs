@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Quitmed_Scraper.Console.Configuration;
+namespace Quitmed_scraper.Database.Configuration;
 
-internal record DatabaseConfiguration
+public record DatabaseConfiguration
 {
     public const string ConfigurationSection = "Database";
 

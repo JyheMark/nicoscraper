@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.Console", "src\Quitmed-Scraper.Console\Quitmed-Scraper.Console.csproj", "{AE4E0484-61B2-4091-88A0-B5123E0E8B7B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-scraper.Database", "src\Quitmed-scraper.Database\Quitmed-scraper.Database.csproj", "{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.Database.Seeder", "src\Quitmed-Scraper.Database.Seeder\Quitmed-Scraper.Database.Seeder.csproj", "{44B9FC41-63A5-4384-B047-91B2C5C9193E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +22,14 @@ Global
 		{AE4E0484-61B2-4091-88A0-B5123E0E8B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE4E0484-61B2-4091-88A0-B5123E0E8B7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE4E0484-61B2-4091-88A0-B5123E0E8B7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44B9FC41-63A5-4384-B047-91B2C5C9193E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44B9FC41-63A5-4384-B047-91B2C5C9193E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44B9FC41-63A5-4384-B047-91B2C5C9193E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44B9FC41-63A5-4384-B047-91B2C5C9193E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
