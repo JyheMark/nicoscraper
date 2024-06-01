@@ -1,9 +1,9 @@
 ﻿using Akka.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Quitmed_Scraper.Console.Actors;
 using Quitmed_scraper.Database;
 using Quitmed_scraper.Database.Configuration;
+using Quitmed_Scraper.Library.Actors;
 
 namespace Quitmed_Scraper.Console.Extensions;
 

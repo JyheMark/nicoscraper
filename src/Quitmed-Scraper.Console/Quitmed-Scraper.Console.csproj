@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Quitmed-scraper.Database\Quitmed-scraper.Database.csproj" />
+    <ProjectReference Include="..\Quitmed-Scraper.Library\Quitmed-Scraper.Library.csproj" />
   </ItemGroup>
 
 </Project>

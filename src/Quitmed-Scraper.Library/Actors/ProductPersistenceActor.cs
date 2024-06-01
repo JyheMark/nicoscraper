@@ -2,13 +2,13 @@
 using Akka.Event;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Quitmed_Scraper.Console.Actors.Messages;
 using Quitmed_scraper.Database;
 using Quitmed_scraper.Database.Models;
+using Quitmed_Scraper.Library.Actors.Messages;
 
-namespace Quitmed_Scraper.Console.Actors;
+namespace Quitmed_Scraper.Library.Actors;
 
-internal class ProductPersistenceActor : ReceiveActor
+public class ProductPersistenceActor : ReceiveActor
 {
     private readonly ILoggingAdapter _logger;
     private readonly IServiceScopeFactory _scopeFactory;

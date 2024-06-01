@@ -1,11 +1,11 @@
-﻿namespace Quitmed_Scraper.Console.QuitMed;
+﻿namespace Quitmed_Scraper.Library.QuitMed;
 
-internal record ProductMetadataWrapper
+public record ProductMetadataWrapper
 {
     public IEnumerable<ProductMetadata> Products { get; set; }
 }
 
-internal record ProductMetadata
+public record ProductMetadata
 {
     public long Id { get; init; }
     public string Gid { get; init; }
@@ -13,7 +13,7 @@ internal record ProductMetadata
     public string Type { get; init; }
     public IEnumerable<Variant> Variants { get; init; }
 
-    internal record Variant
+    public record Variant
     {
         public long Id { get; init; }
         public int Price { get; init; }

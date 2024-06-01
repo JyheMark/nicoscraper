@@ -2,13 +2,13 @@
 using Akka.DependencyInjection;
 using Akka.Event;
 using Microsoft.Extensions.DependencyInjection;
-using Quitmed_Scraper.Console.Actors.Messages;
 using Quitmed_scraper.Database;
 using Quitmed_scraper.Database.Models;
+using Quitmed_Scraper.Library.Actors.Messages;
 
-namespace Quitmed_Scraper.Console.Actors;
+namespace Quitmed_Scraper.Library.Actors;
 
-internal class OrchestrationActor : ReceiveActor
+public class OrchestrationActor : ReceiveActor
 {
     private readonly Dictionary<Guid, Type> _dispensaryToScrapeActorMapping;
     private readonly Dictionary<IActorRef, bool> _childrenActorsCompleted;

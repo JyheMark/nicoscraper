@@ -4,13 +4,13 @@ using System.Text.RegularExpressions;
 using Akka.Actor;
 using Akka.DependencyInjection;
 using Akka.Event;
-using Quitmed_Scraper.Console.Actors.Messages;
-using Quitmed_Scraper.Console.QuitMed;
 using Quitmed_scraper.Database.Models;
+using Quitmed_Scraper.Library.Actors.Messages;
+using Quitmed_Scraper.Library.QuitMed;
 
-namespace Quitmed_Scraper.Console.Actors;
+namespace Quitmed_Scraper.Library.Actors;
 
-internal class QuitmedScraperActor : ReceiveActor
+public class QuitmedScraperActor : ReceiveActor
 {
     private readonly ILoggingAdapter _logger;
     private readonly HttpClient _httpClient;
