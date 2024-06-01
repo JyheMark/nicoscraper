@@ -2,20 +2,27 @@
 using Akka.DependencyInjection;
 using Akka.Event;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Quitmed_scraper.Database;
 using Quitmed_scraper.Database.Models;
 using Quitmed_Scraper.Library.Actors.Messages;
+using Quitmed_Scraper.Library.Configuration;
 
 namespace Quitmed_Scraper.Library.Actors;
 
-public class OrchestrationActor : ReceiveActor
+public class OrchestrationActor : ReceiveActor, IWithTimers
 {
-    private readonly Dictionary<Guid, Type> _dispensaryToScrapeActorMapping;
     private readonly Dictionary<IActorRef, bool> _childrenActorsCompleted;
+    private readonly Dictionary<Guid, Type> _dispensaryToScrapeActorMapping;
     private readonly ILoggingAdapter _logger;
+    private readonly TimeOnly _scheduledScrapeTime;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public OrchestrationActor(IServiceScopeFactory scopeFactory)
+    public OrchestrationActor(IServiceScopeFactory scopeFactory,
+        IOptions<ScrapingScheduleConfiguration> scrapingSchedule)
     {
+        _scopeFactory = scopeFactory;
+        _scheduledScrapeTime = scrapingSchedule.Value.ScrapeAt;
         _childrenActorsCompleted = new Dictionary<IActorRef, bool>();
         _logger = Context.GetLogger();
         _dispensaryToScrapeActorMapping = new Dictionary<Guid, Type>
@@ -23,16 +30,27 @@ public class OrchestrationActor : ReceiveActor
             { Guid.Parse("c123f55e-9d6b-4dd4-9754-11cddd50ef62"), typeof(QuitmedScraperActor) }
         };
 
-        using IServiceScope scope = scopeFactory.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<QuitmedScraperDatabaseContext>();
+        Become(Idle);
+        Self.Tell(new StartScrape());
+    }
 
-        StartScrapers(dbContext);
+    public ITimerScheduler Timers { get; set; } = null!;
+
+    private void Idle()
+    {
+        Receive<StartScrape>(_ =>
+        {
+            using IServiceScope scope = _scopeFactory.CreateScope();
+            using var dbContext = scope.ServiceProvider.GetRequiredService<QuitmedScraperDatabaseContext>();
+
+            StartScrapers(dbContext);
+        });
     }
 
     private void StartScrapers(QuitmedScraperDatabaseContext dbContext)
     {
         Become(Processing);
-        
+
         List<Dispensary> dispensaries = GetDispensaries(dbContext);
         List<ExecutionLog> previousExecutionLogs = GetLastExecutionForDispensaries(dbContext);
 
@@ -52,7 +70,7 @@ public class OrchestrationActor : ReceiveActor
                     dispensary.Name);
             }
         }
-        
+
         if (_childrenActorsCompleted.Count == 0)
         {
             _logger.Warning("No scraper actors were started. Shutting down");
@@ -71,7 +89,7 @@ public class OrchestrationActor : ReceiveActor
             }
 
             _childrenActorsCompleted[Sender] = true;
-            
+
             if (_childrenActorsCompleted.Values.All(p => p))
                 CompleteProcessing();
         });
@@ -79,9 +97,22 @@ public class OrchestrationActor : ReceiveActor
 
     private void CompleteProcessing()
     {
-        _logger.Info("All scraper actors have completed. Shutting down");
-        Context.Stop(Self);
-        Context.System.Terminate();
+        _logger.Info("All scraper actors have completed.");
+
+        Become(Idle);
+        Timers.StartSingleTimer("start-scrape", new StartScrape(), GetTimeToNextScrape());
+        _logger.Info("Scheduled next scrape for {0}", DateTime.Now + GetTimeToNextScrape());
+    }
+
+    private TimeSpan GetTimeToNextScrape()
+    {
+        DateTime now = DateTime.Now;
+        DateTime nextScrape = new(now.Year, now.Month, now.Day, _scheduledScrapeTime.Hour, _scheduledScrapeTime.Minute, _scheduledScrapeTime.Second);
+
+        if (nextScrape < now) 
+            nextScrape = nextScrape.AddDays(1);
+
+        return nextScrape - now;
     }
 
     private void StartScrapeForDispensary(Dispensary dispensary)
@@ -98,7 +129,7 @@ public class OrchestrationActor : ReceiveActor
     private void StartScraperActorForDispensary(Dispensary dispensary, Type scraperActorType)
     {
         IActorRef? actorRef = Context.ActorOf(DependencyResolver.For(Context.System).Props(scraperActorType),
-                $"{dispensary.Name}-scraper-actor");
+            $"{dispensary.Name}-scraper-actor");
 
         _childrenActorsCompleted.Add(actorRef, false);
 
@@ -107,18 +138,15 @@ public class OrchestrationActor : ReceiveActor
 
     private static List<ExecutionLog> GetLastExecutionForDispensaries(QuitmedScraperDatabaseContext dbContext)
     {
-        var executionLogs = dbContext.ExecutionLogs.GroupBy(p => p.Dispensary.Id);
-        
+        IQueryable<IGrouping<Guid, ExecutionLog>> executionLogs = dbContext.ExecutionLogs.GroupBy(p => p.Dispensary.Id);
+
         List<ExecutionLog> result = new();
-        
-        foreach (var group in executionLogs)
+
+        foreach (IGrouping<Guid, ExecutionLog> group in executionLogs)
         {
-            var max = group.MaxBy(e => e.EndTimeUtc);
-            
-            if (max != null)
-            {
-                result.Add(max);
-            }
+            ExecutionLog? max = group.MaxBy(e => e.EndTimeUtc);
+
+            if (max != null) result.Add(max);
         }
 
         return result;
@@ -128,4 +156,6 @@ public class OrchestrationActor : ReceiveActor
     {
         return dbContext.Dispensaries.ToList();
     }
+
+    private record StartScrape;
 }

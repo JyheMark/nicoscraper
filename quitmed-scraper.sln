@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.Database.Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.Library", "src\Quitmed-Scraper.Library\Quitmed-Scraper.Library.csproj", "{8A2E8E0F-BBE0-47A5-B3CB-4614CFAFFEE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.WebApp", "src\Quitmed-Scraper.WebApp\Quitmed-Scraper.WebApp.csproj", "{09C09B23-0059-4016-8472-605950A8E41D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{8A2E8E0F-BBE0-47A5-B3CB-4614CFAFFEE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A2E8E0F-BBE0-47A5-B3CB-4614CFAFFEE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A2E8E0F-BBE0-47A5-B3CB-4614CFAFFEE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09C09B23-0059-4016-8472-605950A8E41D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09C09B23-0059-4016-8472-605950A8E41D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09C09B23-0059-4016-8472-605950A8E41D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09C09B23-0059-4016-8472-605950A8E41D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
