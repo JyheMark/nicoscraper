@@ -1,0 +1,94 @@
+﻿@page "/dispensaries/{DispensaryId:guid}"
+@using Microsoft.EntityFrameworkCore
+@using Quitmed_scraper.Database
+@inject QuitmedScraperDatabaseContext QuitmedScraperDatabaseContext;
+@rendermode InteractiveServer
+
+@if (_dispensary != null)
+{
+    <MudText Typo="Typo.h2">@_dispensary.Name</MudText>
+    
+    @if (DispensaryProductsLoaded())
+    {
+        <MudTable Items="@_dispensary!.Products" Filter="new Func<DB.Product, bool>(FilterProducts)">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Products</MudText>
+                <MudSpacer/>
+                <MudTextField 
+                    @bind-Value="_searchString" 
+                    Placeholder="Search" 
+                    Adornment="Adornment.Start" 
+                    AdornmentIcon="@Icons.Material.Filled.Search" 
+                    IconSize="Size.Medium"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Product</MudTh>
+                <MudTh>Price</MudTh>
+                <MudTh>In Stock</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Product">
+                    <MudLink Href="@(GetProductLink(context.Id))">@context.Name</MudLink>
+                </MudTd>
+                <MudTd DataLabel="Price">@PriceHelper.FormatAsPrice(context.Price)</MudTd>
+                <MudTd DataLabel="In Stock">
+                    @if (context.InStock)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Check" Color="@Color.Success"/>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Close" Color="@Color.Error"/>
+                    }
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+    else
+    {
+        <MudText>No products to show</MudText>
+    }
+}
+else
+{
+    <MudText>Dispensary with Id @DispensaryId does not exist</MudText>
+}
+
+@code{
+
+    [Parameter] public Guid DispensaryId { get; set; }
+
+    private DB.Dispensary? _dispensary;
+    private string _searchString = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dispensary = await QuitmedScraperDatabaseContext.Dispensaries.Include(p => p.Products).SingleOrDefaultAsync(p => p.Id == DispensaryId);
+    }
+
+    private string GetProductLink(Guid productId)
+    {
+        return $"/products/{productId}";
+    }
+
+    private bool DispensaryProductsLoaded()
+    {
+        return _dispensary?.Products != null && _dispensary.Products.Any();
+    }
+
+    private bool FilterProducts(DB.Product product)
+    {
+        return FilterProducts(product, _searchString);
+    }
+
+    private bool FilterProducts(DB.Product product, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (product.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+}

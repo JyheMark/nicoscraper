@@ -1,0 +1,99 @@
+﻿@page "/products/{productId:guid}"
+@using Microsoft.EntityFrameworkCore
+@using Quitmed_scraper.Database
+@inject QuitmedScraperDatabaseContext DatabaseContext;
+
+@if (_product == null)
+{
+    <MudText>Product not found</MudText>
+}
+else
+{
+    <MudText Typo="Typo.h2">@_product.Name</MudText>
+    <table class="table">
+        <tbody>
+        <tr>
+            <td>
+                <MudText>Dispensary:</MudText>
+            </td>
+            <td>
+                <MudText>@_product.Dispensary.Name</MudText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <MudText>Vendor:</MudText>
+            </td>
+            <td>
+                <MudText>@_product.Vendor</MudText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <MudText>Price:</MudText>
+            </td>
+            <td>
+                <MudText>@PriceHelper.FormatAsPrice(_product.Price)</MudText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <MudText>In Stock?</MudText>
+            </td>
+            <td>
+                @if (_product.InStock)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"/>
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Close" Color="Color.Error"/>
+                }
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <MudText Typo="Typo.h3" Style="border-top: .25rem;">Price History</MudText>
+
+    @if (_priceHistorySeries[0].Data.Length > 1)
+    {
+        <MudChart ChartType="ChartType.Line" ChartSeries="@_priceHistorySeries" XAxisLabels="_priceHistoryXAxisLabels"/>
+    }
+    else
+    {
+        <MudPaper>
+            <MudText>No changes</MudText>
+        </MudPaper>
+    }
+}
+
+@code {
+    [Parameter] public Guid ProductId { get; set; }
+
+    private Quitmed_scraper.Database.Models.Product? _product;
+    private List<ChartSeries> _priceHistorySeries;
+    private string[] _priceHistoryXAxisLabels;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _product = await DatabaseContext
+            .Products
+            .Include(p => p.PriceHistory)
+            .Include(p => p.Dispensary)
+            .SingleOrDefaultAsync(p => p.Id == ProductId);
+
+        if (_product != null)
+        {
+            _priceHistorySeries = new List<ChartSeries>
+            {
+                new()
+                {
+                    Name = "$",
+                    Data = _product.PriceHistory.Select(ph => PriceHelper.FormatAsPriceDouble(ph.Price)).ToArray()
+                }
+            };
+
+            _priceHistoryXAxisLabels = _product.PriceHistory.Select(ph => ph.Timestamp.ToString("yyyy-MM-dd")).ToArray();
+        }
+    }
+}

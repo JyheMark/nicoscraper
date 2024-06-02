@@ -1,49 +1,36 @@
 ﻿@page "/"
 @using Microsoft.EntityFrameworkCore
 @using Quitmed_scraper.Database
-@using Quitmed_scraper.Database.Models
-@inject QuitmedScraperDatabaseContext QuitmedScraperDatabaseContext;
+@inject QuitmedScraperDatabaseContext DatabaseContext
 
-<PageTitle>Home</PageTitle>
-
-@if (_products != null)
+<MudText Typo="Typo.h2">Dispensaries</MudText>
+@if (_dispensaries != null)
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Price</th>
-                <th>In Stock</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (Product product in _products)
-        {
-            <tr>
-                <td>@product.Name</td>
-                <td>@FormatPrice(product.Price)</td>
-                <td>@product.InStock</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>Loading...</p>
+    <MudStack>
+        <MudTable Items="@_dispensaries">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    <MudLink Href="@GetDispensaryLink(context)">@context.Name</MudLink>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudStack>
 }
 
-@code{
-
-    private List<Product>? _products;
+@code
+{
+    private List<DB.Dispensary>? _dispensaries;
 
     protected override async Task OnInitializedAsync()
     {
-        _products = await QuitmedScraperDatabaseContext.Products.ToListAsync();
+        _dispensaries = await DatabaseContext.Dispensaries.ToListAsync();
     }
 
-    private string FormatPrice(int price)
+    private string GetDispensaryLink(DB.Dispensary dispensary)
     {
-        return (price / 100.0m).ToString("C");
+        return $"/dispensaries/{dispensary.Id}";
     }
 }
