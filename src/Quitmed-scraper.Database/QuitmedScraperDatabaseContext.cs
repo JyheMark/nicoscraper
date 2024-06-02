@@ -52,6 +52,7 @@ public class QuitmedScraperDatabaseContext : DbContext
             entity.Property(e => e.Vendor).IsRequired();
             entity.Property(e => e.Price).IsRequired();
             entity.Property(e => e.InStock).IsRequired();
+            entity.Property(e => e.IsArchived).IsRequired().HasDefaultValue(false);
             entity.HasIndex(e => e.Key).IsUnique();
             entity.HasMany<HistoricalPricing>(e => e.PriceHistory).WithOne(e => e.Product);
         });

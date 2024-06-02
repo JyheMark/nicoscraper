@@ -10,7 +10,7 @@
     
     @if (DispensaryProductsLoaded())
     {
-        <MudTable Items="@_dispensary!.Products" Filter="new Func<DB.Product, bool>(FilterProducts)">
+        <MudTable Items="@(GetNonArchivedProducts())" Filter="new Func<DB.Product, bool>(FilterProducts)">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Products</MudText>
                 <MudSpacer/>
@@ -89,6 +89,14 @@ else
             return true;
 
         return false;
+    }
+
+    private DB.Product[] GetNonArchivedProducts()
+    {
+        if (_dispensary!.Products == null || !_dispensary.Products.Any())
+            return [];
+        
+        return _dispensary!.Products.Where(p => !p.IsArchived).ToArray();
     }
 
 }

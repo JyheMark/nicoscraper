@@ -10,4 +10,5 @@ public class Product
     public bool InStock { get; set; }
     public Dispensary Dispensary { get; set; } = null!;
     public List<HistoricalPricing> PriceHistory { get; set; } = null!;
+    public bool IsArchived { get; set; }
 }

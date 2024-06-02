@@ -29,37 +29,10 @@ public class ProductPersistenceActor : ReceiveActor
             var dbContext = scope.ServiceProvider.GetRequiredService<QuitmedScraperDatabaseContext>();
             dbContext.AttachRange(msg.Products.Select(p => p.Dispensary));
 
-            List<Product> existingProducts = await GetBatchProductsById(msg.Products, dbContext);
-            var newProducts = new List<Product>();
+            List<Product> existingProducts = await dbContext.Products.Include(p => p.PriceHistory).ToListAsync();
             
-            foreach (Product product in msg.Products)
-            {
-                Product? existingProduct = existingProducts.SingleOrDefault(p => p.Key == product.Key);
-
-                var priceHistoryRecord = new HistoricalPricing
-                {
-                    Price = product.Price,
-                    Product = product,
-                    Timestamp = msg.EndTime
-                };
-
-                if (existingProduct != null)
-                {
-                    existingProduct.Dispensary = product.Dispensary;
-                    existingProduct.Name = product.Name;
-                    existingProduct.Vendor = product.Vendor;
-                    existingProduct.Price = product.Price;
-                    existingProduct.InStock = product.InStock;
-
-                    if (existingProduct.PriceHistory.MaxBy(p => p.Timestamp)?.Price != product.Price)
-                        existingProduct.PriceHistory.Add(priceHistoryRecord);
-                }
-                else
-                {
-                    product.PriceHistory = [priceHistoryRecord];
-                    newProducts.Add(product);
-                }
-            }
+            List<Product> newProducts = ProcessIncomingProducts(msg, existingProducts);
+            ProcessArchivedProducts(msg, existingProducts);
 
             if (newProducts.Any())
                 await dbContext.Products.AddRangeAsync(newProducts);
@@ -82,6 +55,53 @@ public class ProductPersistenceActor : ReceiveActor
         }
     }
 
+    private static void ProcessArchivedProducts(PersistProducts msg, List<Product> existingProducts)
+    {
+        var archivedProducts = existingProducts.Where(ep => !msg.Products.Select(p => p.Key).Contains(ep.Key));
+        foreach (Product product in archivedProducts)
+        {
+            product.IsArchived = true;
+            product.InStock = false;
+        }
+    }
+
+    private static List<Product> ProcessIncomingProducts(PersistProducts msg, List<Product> existingProducts)
+    {
+        var newProducts = new List<Product>();
+
+        foreach (Product product in msg.Products)
+        {
+            Product? existingProduct = existingProducts.SingleOrDefault(p => p.Key == product.Key);
+
+            var priceHistoryRecord = new HistoricalPricing
+            {
+                Price = product.Price,
+                Product = product,
+                Timestamp = msg.EndTime
+            };
+
+            if (existingProduct != null)
+            {
+                existingProduct.Dispensary = product.Dispensary;
+                existingProduct.Name = product.Name;
+                existingProduct.Vendor = product.Vendor;
+                existingProduct.Price = product.Price;
+                existingProduct.InStock = product.InStock;
+                existingProduct.IsArchived = false;
+
+                if (existingProduct.PriceHistory.MaxBy(p => p.Timestamp)?.Price != product.Price)
+                    existingProduct.PriceHistory.Add(priceHistoryRecord);
+            }
+            else
+            {
+                product.PriceHistory = [priceHistoryRecord];
+                newProducts.Add(product);
+            }
+        }
+
+        return newProducts;
+    }
+
     private static IEnumerable<ExecutionLog> GenerateExecutionLogs(PersistProducts msg)
     {
         return msg.Products.DistinctBy(p => p.Dispensary.Id).Select(p => new ExecutionLog
@@ -90,10 +110,5 @@ public class ProductPersistenceActor : ReceiveActor
             EndTimeUtc = msg.EndTime,
             Dispensary = p.Dispensary
         });
-    }
-
-    private static async Task<List<Product>> GetBatchProductsById(IEnumerable<Product> products, QuitmedScraperDatabaseContext dbContext)
-    {
-        return await dbContext.Products.Include(p => p.PriceHistory).Where(p => products.Select(q => q.Key).Contains(p.Key)).ToListAsync();
     }
 }
