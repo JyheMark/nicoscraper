@@ -1,4 +1,5 @@
 ﻿using Akka.Hosting;
+using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using Quitmed_scraper.Database;
 using Quitmed_scraper.Database.Configuration;
@@ -32,10 +33,16 @@ internal static class StartupExtensions
 
     private static void BindConfigurationModels(IServiceCollection services, IConfiguration configuration)
     {
-        services
-            .AddOptions<DatabaseConfiguration>()
-            .Bind(configuration.GetSection(DatabaseConfiguration.ConfigurationSection));
+        var connectionString = Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING") ?? configuration["Database:ConnectionString"];
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException("Database connection string is not set");
 
+        var options = Options.Create(new DatabaseConfiguration
+        {
+            ConnectionString = connectionString
+        });
+        services.AddSingleton(options);
+        
         services
             .AddOptions<ScrapingScheduleConfiguration>()
             .Bind(configuration.GetSection(ScrapingScheduleConfiguration.ConfigurationSection));

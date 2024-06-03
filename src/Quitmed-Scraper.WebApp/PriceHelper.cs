@@ -1,10 +1,12 @@
-﻿namespace Quitmed_Scraper.WebApp;
+﻿using System.Globalization;
+
+namespace Quitmed_Scraper.WebApp;
 
 internal static class PriceHelper
 {
     public static string FormatAsPrice(int price)
     {
-        return (price / 100.0m).ToString("C");
+        return (price / 100.0m).ToString("C", new CultureInfo("en-AU"));
     }
     
     public static double FormatAsPriceDouble(int price)
