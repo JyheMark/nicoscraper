@@ -2,12 +2,13 @@ param location string
 param postgreSqlServerAdminUsername string
 param outboundSubnetId string
 param privateDnsZoneId string
+param name string
 
 @secure()
 param postgreSqlServerAdminPwd string
 
 resource postgreSqlServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
-  name: 'nicoscrape-app-server'
+  name: name
   location: location
   tags: {
     'managed-by': 'Bicep'
@@ -17,6 +18,7 @@ resource postgreSqlServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-
     administratorLoginPassword: postgreSqlServerAdminPwd
     version: '12'
     network: {
+      publicNetworkAccess: 'Disabled'
       delegatedSubnetResourceId: outboundSubnetId
       privateDnsZoneArmResourceId: privateDnsZoneId
     }
@@ -26,6 +28,10 @@ resource postgreSqlServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-
     }
     storage: {
       storageSizeGB: 32
+    }
+    backup:{
+      backupRetentionDays: 7
+      geoRedundantBackup: 'Disabled'
     }
   }
   sku: {

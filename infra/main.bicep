@@ -29,10 +29,11 @@ module vnetModule './modules/vnet.bicep' = {
   ]
 }
 
-module dbModule './modules//postgres.bicep' = {
+module dbModule './modules/postgres.bicep' = {
   name: 'dbDeploy'
   scope: resourceGroup(resourceGroupName)
   params: {
+    name: postgreSqlServerName
     location: location
     outboundSubnetId: vnetModule.outputs.outboundSubnetId
     postgreSqlServerAdminPwd: masterKv.getSecret('nicoscrape-db-admin-password')
@@ -60,6 +61,6 @@ module appServiceModule './modules/web-app.bicep' = {
     postgreSqlServerAdminUsername: postgreSqlServerAdminUsername
     postgreSqlDatabaseName: postgreSqlDatabaseName
     postgreSqlServerName: postgreSqlServerName
-    subnetId: vnetModule.outputs.subnetId
+    subnetId: vnetModule.outputs.outboundNestedSubnetId
   }
 }

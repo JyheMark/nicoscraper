@@ -1,6 +1,6 @@
 param location string
 
-resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' = {
   location: location
   name: 'vnet-${uniqueString(deployment().name)}'
   properties: {
@@ -13,8 +13,8 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
   }
 }
 
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
-  name: 'subnet-${uniqueString(deployment().name)}-0'
+resource outboundSubnetNested 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
+  name: 'subnet-${uniqueString(deployment().name)}-outbound-nested'
   parent: vnet
   properties: {
     delegations: [
@@ -35,7 +35,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
 }
 
 resource outboundSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
-  name: 'subnet-${uniqueString(deployment().name)}-1'
+  name: 'subnet-${uniqueString(deployment().name)}-outbound'
   parent: vnet
   properties: {
     delegations: [
@@ -52,13 +52,13 @@ resource outboundSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' =
 }
 
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'dnszone-${uniqueString(deployment().name)}.azure.com'
+  name: 'dnszone-${uniqueString(deployment().name)}.postgres.database.azure.com'
   location: 'global'
   properties: {}
   dependsOn: []
 }
 
 output id string = vnet.id
-output subnetId string = subnet.id
+output outboundNestedSubnetId string = outboundSubnetNested.id
 output outboundSubnetId string = outboundSubnet.id
 output privateDnsZoneId string = privateDnsZone.id

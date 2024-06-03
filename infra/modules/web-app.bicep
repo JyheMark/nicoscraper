@@ -16,6 +16,8 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
     'managed-by': 'Bicep'
   }
   properties: {
+    workerTierName: 'ASP-nicoscraperg-9709'
+    targetWorkerSizeId: 0
     targetWorkerCount: 1
     reserved: true
     zoneRedundant: false
