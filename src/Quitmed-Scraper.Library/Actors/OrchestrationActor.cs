@@ -19,15 +19,19 @@ public class OrchestrationActor : ReceiveActor, IWithTimers
     private readonly IServiceScopeFactory _scopeFactory;
 
     public OrchestrationActor(IServiceScopeFactory scopeFactory,
-        IOptions<ScrapingScheduleConfiguration> scrapingSchedule)
+        IOptions<ScrapingScheduleConfiguration> scrapingSchedule,
+        IOptions<DispensaryConfiguration> dispensaryConfigurationOptions)
     {
         _scopeFactory = scopeFactory;
         _scheduledScrapeTime = scrapingSchedule.Value.ScrapeAt;
         _childrenActorsCompleted = new Dictionary<IActorRef, bool>();
         _logger = Context.GetLogger();
+
+        var dispensaryConfig = dispensaryConfigurationOptions.Value;
+        
         _dispensaryToScrapeActorMapping = new Dictionary<Guid, Type>
         {
-            { Guid.Parse("c123f55e-9d6b-4dd4-9754-11cddd50ef62"), typeof(QuitmedScraperActor) }
+            { dispensaryConfig.Dispensaries.Single(p => p.Name == "QuitMed").Id, typeof(QuitmedScraperActor) }
         };
 
         Become(Idle);

@@ -12,6 +12,9 @@
     <Content Update="appsettings.Development.json">
       <DependentUpon>appsettings.json</DependentUpon>
     </Content>
+    <Content Update="appsettings.Production.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="Akka.Hosting" Version="1.5.20" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="7.2.0" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
   </ItemGroup>
 

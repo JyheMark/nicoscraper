@@ -39,5 +39,9 @@ internal static class StartupExtensions
         services
             .AddOptions<ScrapingScheduleConfiguration>()
             .Bind(configuration.GetSection(ScrapingScheduleConfiguration.ConfigurationSection));
+
+        services
+            .AddOptions<DispensaryConfiguration>()
+            .Bind(configuration.GetSection(DispensaryConfiguration.ConfigurationSection));
     }
 }
