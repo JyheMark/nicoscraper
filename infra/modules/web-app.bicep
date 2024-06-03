@@ -24,7 +24,6 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
     tier: 'Basic'
     name: 'B1'
   }
-  dependsOn: []
 }
 
 resource webApp 'Microsoft.Web/sites@2023-12-01' = {

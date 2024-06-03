@@ -24,6 +24,9 @@ module vnetModule './modules/vnet.bicep' = {
   params: {
     location: location
   }
+  dependsOn: [
+    rgModule
+  ]
 }
 
 module dbModule './modules//postgres.bicep' = {
@@ -36,12 +39,17 @@ module dbModule './modules//postgres.bicep' = {
     postgreSqlServerAdminUsername: postgreSqlServerAdminUsername
     privateDnsZoneId: vnetModule.outputs.privateDnsZoneId
   }
+  dependsOn: [
+    rgModule
+    vnetModule
+  ]
 }
 
 module appServiceModule './modules/web-app.bicep' = {
   name: 'appServiceDeploy'
   dependsOn: [
     rgModule
+    vnetModule
     dbModule
   ]
   scope: resourceGroup(resourceGroupName)
