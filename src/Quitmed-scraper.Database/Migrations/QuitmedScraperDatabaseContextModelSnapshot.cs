@@ -45,6 +45,14 @@ namespace Quitmed_scraper.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Dispensaries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c123f55e-9d6b-4dd4-9754-11cddd50ef62"),
+                            Name = "QuitMed",
+                            ScrapeUrl = "https://quitmed.com.au/collections/all"
+                        });
                 });
 
             modelBuilder.Entity("Quitmed_scraper.Database.Models.ExecutionLog", b =>

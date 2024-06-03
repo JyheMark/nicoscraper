@@ -12,8 +12,8 @@ using Quitmed_scraper.Database;
 namespace Quitmed_scraper.Database.Migrations
 {
     [DbContext(typeof(QuitmedScraperDatabaseContext))]
-    [Migration("20240531172442_Initial_Migration")]
-    partial class Initial_Migration
+    [Migration("20240603103226_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,12 +48,23 @@ namespace Quitmed_scraper.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Dispensaries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c123f55e-9d6b-4dd4-9754-11cddd50ef62"),
+                            Name = "QuitMed",
+                            ScrapeUrl = "https://quitmed.com.au/collections/all"
+                        });
                 });
 
             modelBuilder.Entity("Quitmed_scraper.Database.Models.ExecutionLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DispensaryId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("EndTimeUtc")
@@ -63,6 +74,8 @@ namespace Quitmed_scraper.Database.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DispensaryId");
 
                     b.ToTable("ExecutionLogs");
                 });
@@ -101,6 +114,11 @@ namespace Quitmed_scraper.Database.Migrations
                     b.Property<bool>("InStock")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsArchived")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasColumnType("text");
@@ -124,6 +142,17 @@ namespace Quitmed_scraper.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Quitmed_scraper.Database.Models.ExecutionLog", b =>
+                {
+                    b.HasOne("Quitmed_scraper.Database.Models.Dispensary", "Dispensary")
+                        .WithMany()
+                        .HasForeignKey("DispensaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dispensary");
                 });
 
             modelBuilder.Entity("Quitmed_scraper.Database.Models.HistoricalPricing", b =>

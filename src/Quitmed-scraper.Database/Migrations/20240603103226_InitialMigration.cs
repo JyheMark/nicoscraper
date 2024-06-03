@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Quitmed_scraper.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_Migration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,11 +30,18 @@ namespace Quitmed_scraper.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     StartTimeUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndTimeUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    EndTimeUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DispensaryId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExecutionLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExecutionLogs_Dispensaries_DispensaryId",
+                        column: x => x.DispensaryId,
+                        principalTable: "Dispensaries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,7 +54,8 @@ namespace Quitmed_scraper.Database.Migrations
                     Vendor = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<int>(type: "integer", nullable: false),
                     InStock = table.Column<bool>(type: "boolean", nullable: false),
-                    DispensaryId = table.Column<Guid>(type: "uuid", nullable: false)
+                    DispensaryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsArchived = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -80,6 +88,11 @@ namespace Quitmed_scraper.Database.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Dispensaries",
+                columns: new[] { "Id", "Name", "ScrapeUrl" },
+                values: new object[] { new Guid("c123f55e-9d6b-4dd4-9754-11cddd50ef62"), "QuitMed", "https://quitmed.com.au/collections/all" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Dispensaries_Name",
                 table: "Dispensaries",
@@ -91,6 +104,11 @@ namespace Quitmed_scraper.Database.Migrations
                 table: "Dispensaries",
                 column: "ScrapeUrl",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExecutionLogs_DispensaryId",
+                table: "ExecutionLogs",
+                column: "DispensaryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HistoricalPricing_ProductId",

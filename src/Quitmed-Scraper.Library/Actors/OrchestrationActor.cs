@@ -19,23 +19,29 @@ public class OrchestrationActor : ReceiveActor, IWithTimers
     private readonly IServiceScopeFactory _scopeFactory;
 
     public OrchestrationActor(IServiceScopeFactory scopeFactory,
-        IOptions<ScrapingScheduleConfiguration> scrapingSchedule,
-        IOptions<DispensaryConfiguration> dispensaryConfigurationOptions)
+        IOptions<ScrapingScheduleConfiguration> scrapingSchedule)
     {
         _scopeFactory = scopeFactory;
         _scheduledScrapeTime = scrapingSchedule.Value.ScrapeAt;
         _childrenActorsCompleted = new Dictionary<IActorRef, bool>();
         _logger = Context.GetLogger();
-
-        var dispensaryConfig = dispensaryConfigurationOptions.Value;
         
+        List<Dispensary> dispensaries = GetDispensaries();
+
         _dispensaryToScrapeActorMapping = new Dictionary<Guid, Type>
         {
-            { dispensaryConfig.Dispensaries.Single(p => p.Name == "QuitMed").Id, typeof(QuitmedScraperActor) }
+            { dispensaries.Single(p => p.Name == "QuitMed").Id, typeof(QuitmedScraperActor) }
         };
 
         Become(Idle);
         Self.Tell(new StartScrape());
+    }
+
+    private List<Dispensary> GetDispensaries()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        using var dbContext = scope.ServiceProvider.GetRequiredService<QuitmedScraperDatabaseContext>();
+        return dbContext.Dispensaries.ToList();
     }
 
     public ITimerScheduler Timers { get; set; } = null!;

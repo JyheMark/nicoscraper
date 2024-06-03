@@ -44,6 +44,14 @@ public class QuitmedScraperDatabaseContext : DbContext
             entity.HasIndex(e => e.Name).IsUnique();
             entity.HasMany<Product>(e => e.Products).WithOne(e => e.Dispensary);
         });
+        modelBuilder.Entity<Dispensary>().HasData([
+            new Dispensary()
+            {
+                Id = Guid.Parse("c123f55e-9d6b-4dd4-9754-11cddd50ef62"),
+                Name = DispensaryNames.QuitMed,
+                ScrapeUrl = "https://quitmed.com.au/collections/all"
+            }
+        ]);
         modelBuilder.Entity<Product>(entity =>
         {
             entity.HasKey(e => e.Id);

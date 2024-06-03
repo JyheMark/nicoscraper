@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.Console", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-scraper.Database", "src\Quitmed-scraper.Database\Quitmed-scraper.Database.csproj", "{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.Database.Seeder", "src\Quitmed-Scraper.Database.Seeder\Quitmed-Scraper.Database.Seeder.csproj", "{44B9FC41-63A5-4384-B047-91B2C5C9193E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.Library", "src\Quitmed-Scraper.Library\Quitmed-Scraper.Library.csproj", "{8A2E8E0F-BBE0-47A5-B3CB-4614CFAFFEE2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quitmed-Scraper.WebApp", "src\Quitmed-Scraper.WebApp\Quitmed-Scraper.WebApp.csproj", "{09C09B23-0059-4016-8472-605950A8E41D}"
@@ -30,10 +28,6 @@ Global
 		{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{067411E5-0D70-4C2F-AB44-B4B035FB9FFE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{44B9FC41-63A5-4384-B047-91B2C5C9193E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44B9FC41-63A5-4384-B047-91B2C5C9193E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44B9FC41-63A5-4384-B047-91B2C5C9193E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44B9FC41-63A5-4384-B047-91B2C5C9193E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8A2E8E0F-BBE0-47A5-B3CB-4614CFAFFEE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8A2E8E0F-BBE0-47A5-B3CB-4614CFAFFEE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A2E8E0F-BBE0-47A5-B3CB-4614CFAFFEE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
