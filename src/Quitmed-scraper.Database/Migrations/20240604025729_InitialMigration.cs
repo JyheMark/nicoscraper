@@ -69,6 +69,33 @@ namespace Quitmed_scraper.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventSummaries",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DispensaryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Message = table.Column<string>(type: "text", nullable: false),
+                    TimestampUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventSummaries", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EventSummaries_Dispensaries_DispensaryId",
+                        column: x => x.DispensaryId,
+                        principalTable: "Dispensaries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventSummaries_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "HistoricalPricing",
                 columns: table => new
                 {
@@ -106,6 +133,16 @@ namespace Quitmed_scraper.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventSummaries_DispensaryId",
+                table: "EventSummaries",
+                column: "DispensaryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventSummaries_ProductId",
+                table: "EventSummaries",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExecutionLogs_DispensaryId",
                 table: "ExecutionLogs",
                 column: "DispensaryId");
@@ -130,6 +167,9 @@ namespace Quitmed_scraper.Database.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "EventSummaries");
+
             migrationBuilder.DropTable(
                 name: "ExecutionLogs");
 

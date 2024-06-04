@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 
-namespace Quitmed_Scraper.WebApp;
+namespace Quitmed_Scraper.Library;
 
-internal static class PriceHelper
+public static class PriceHelper
 {
     public static string FormatAsPrice(int price)
     {

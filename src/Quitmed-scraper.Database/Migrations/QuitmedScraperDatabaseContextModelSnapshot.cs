@@ -55,6 +55,34 @@ namespace Quitmed_scraper.Database.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Quitmed_scraper.Database.Models.EventSummary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DispensaryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("TimestampUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DispensaryId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("EventSummaries");
+                });
+
             modelBuilder.Entity("Quitmed_scraper.Database.Models.ExecutionLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -139,6 +167,25 @@ namespace Quitmed_scraper.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Quitmed_scraper.Database.Models.EventSummary", b =>
+                {
+                    b.HasOne("Quitmed_scraper.Database.Models.Dispensary", "Dispensary")
+                        .WithMany()
+                        .HasForeignKey("DispensaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Quitmed_scraper.Database.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dispensary");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Quitmed_scraper.Database.Models.ExecutionLog", b =>

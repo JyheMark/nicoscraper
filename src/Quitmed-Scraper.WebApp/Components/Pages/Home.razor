@@ -3,7 +3,7 @@
 @using Quitmed_scraper.Database
 @inject QuitmedScraperDatabaseContext DatabaseContext
 
-<MudText Typo="Typo.h2">Dispensaries</MudText>
+<MudText Typo="Typo.h2" Style="margin-top: 2rem">Dispensaries</MudText>
 @if (_dispensaries != null)
 {
     <MudStack>
@@ -19,14 +19,32 @@
         </MudTable>
     </MudStack>
 }
+@if (_todaysEvents != null)
+{
+    <MudText Typo="Typo.h2" Style="margin-top: 2rem">Todays News</MudText>
+    @if (!_todaysEvents.Any())
+    {
+        <MudText>Nothing interesting...</MudText>   
+    }
+    else
+    {
+        <MudTable Items="@_todaysEvents">
+            <RowTemplate>
+                <MudTd>@context.Message</MudTd>
+            </RowTemplate>
+        </MudTable>   
+    }
+}
 
 @code
 {
     private List<DB.Dispensary>? _dispensaries;
+    private List<DB.EventSummary>? _todaysEvents;
 
     protected override async Task OnInitializedAsync()
     {
         _dispensaries = await DatabaseContext.Dispensaries.ToListAsync();
+        _todaysEvents = await DatabaseContext.EventSummaries.Where(p => p.TimestampUtc.Date == DateTime.UtcNow.Date).ToListAsync();
     }
 
     private string GetDispensaryLink(DB.Dispensary dispensary)

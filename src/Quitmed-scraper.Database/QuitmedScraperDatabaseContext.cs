@@ -12,6 +12,7 @@ public class QuitmedScraperDatabaseContext : DbContext
     public DbSet<ExecutionLog> ExecutionLogs { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Dispensary> Dispensaries { get; set; }
+    public DbSet<EventSummary> EventSummaries { get; set; }
 
     public QuitmedScraperDatabaseContext(IOptions<DatabaseConfiguration> databaseConfiguration)
     {
@@ -68,6 +69,14 @@ public class QuitmedScraperDatabaseContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Price).IsRequired();
+        });
+        modelBuilder.Entity<EventSummary>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne<Product>(e => e.Product).WithMany();
+            entity.HasOne<Dispensary>(e => e.Dispensary).WithMany();
+            entity.Property(e => e.Message).IsRequired();
+            entity.Property(e => e.TimestampUtc).IsRequired();
         });
     }
 }

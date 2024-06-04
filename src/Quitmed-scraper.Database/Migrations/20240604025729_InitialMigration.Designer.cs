@@ -12,7 +12,7 @@ using Quitmed_scraper.Database;
 namespace Quitmed_scraper.Database.Migrations
 {
     [DbContext(typeof(QuitmedScraperDatabaseContext))]
-    [Migration("20240603103226_InitialMigration")]
+    [Migration("20240604025729_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -56,6 +56,34 @@ namespace Quitmed_scraper.Database.Migrations
                             Name = "QuitMed",
                             ScrapeUrl = "https://quitmed.com.au/collections/all"
                         });
+                });
+
+            modelBuilder.Entity("Quitmed_scraper.Database.Models.EventSummary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DispensaryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("TimestampUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DispensaryId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("EventSummaries");
                 });
 
             modelBuilder.Entity("Quitmed_scraper.Database.Models.ExecutionLog", b =>
@@ -142,6 +170,25 @@ namespace Quitmed_scraper.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Quitmed_scraper.Database.Models.EventSummary", b =>
+                {
+                    b.HasOne("Quitmed_scraper.Database.Models.Dispensary", "Dispensary")
+                        .WithMany()
+                        .HasForeignKey("DispensaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Quitmed_scraper.Database.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dispensary");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Quitmed_scraper.Database.Models.ExecutionLog", b =>
