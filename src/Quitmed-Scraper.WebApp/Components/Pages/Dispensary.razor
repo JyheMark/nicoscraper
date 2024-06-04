@@ -8,6 +8,8 @@
 {
     <MudText Typo="Typo.h2">@_dispensary.Name</MudText>
     
+    <MudText>Last updated: @GetLastUpdatedTimeFormatted()</MudText>
+    
     @if (DispensaryProductsLoaded())
     {
         <MudTable Items="@(GetNonArchivedProducts())" Filter="new Func<DB.Product, bool>(FilterProducts)">
@@ -59,16 +61,28 @@ else
     [Parameter] public Guid DispensaryId { get; set; }
 
     private DB.Dispensary? _dispensary;
+    private DateTime? _lastUpdatedUtc;
     private string _searchString = "";
 
     protected override async Task OnInitializedAsync()
     {
         _dispensary = await QuitmedScraperDatabaseContext.Dispensaries.Include(p => p.Products).SingleOrDefaultAsync(p => p.Id == DispensaryId);
+        var relevantScrapes = await QuitmedScraperDatabaseContext.ExecutionLogs.Where(p => p.Dispensary.Id == _dispensary.Id).ToListAsync();
+        _lastUpdatedUtc = relevantScrapes.MaxBy(p => p.EndTimeUtc)?.EndTimeUtc;
     }
 
     private string GetProductLink(Guid productId)
     {
         return $"/products/{productId}";
+    }
+
+    private string GetLastUpdatedTimeFormatted()
+    {
+        if (_lastUpdatedUtc == null)
+            return "Never";
+
+        var lastUpdatedLocalised = _lastUpdatedUtc.Value.ToLocalTime();
+        return lastUpdatedLocalised.ToString("h:mm:ss tt");
     }
 
     private bool DispensaryProductsLoaded()

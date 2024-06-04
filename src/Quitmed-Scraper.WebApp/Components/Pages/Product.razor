@@ -1,7 +1,9 @@
 ﻿@page "/products/{productId:guid}"
 @using Microsoft.EntityFrameworkCore
 @using Quitmed_scraper.Database
+@rendermode InteractiveServer
 @inject QuitmedScraperDatabaseContext DatabaseContext;
+@inject NavigationManager Navigation;
 
 @if (_product == null)
 {
@@ -9,6 +11,8 @@
 }
 else
 {
+    <MudSpacer/>
+    <MudLink @onclick="HandleNavigateBack">Back to @_product.Dispensary.Name</MudLink>
     <MudText Typo="Typo.h2">@_product.Name</MudText>
     <table class="table">
         <tbody>
@@ -95,5 +99,10 @@ else
 
             _priceHistoryXAxisLabels = _product.PriceHistory.Select(ph => ph.Timestamp.ToString("yyyy-MM-dd")).ToArray();
         }
+    }
+
+    private void HandleNavigateBack()
+    {
+        Navigation.NavigateTo($"/dispensaries/{_product.Dispensary.Id}");
     }
 }
